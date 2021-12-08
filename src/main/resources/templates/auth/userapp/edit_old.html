@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/base">
+
+
+<th:block layout:fragment="css-extra">
+
+</th:block>
+
+
+<th:block layout:fragment="js-extra">
+
+</th:block>
+
+
+<section layout:fragment="layout_subheader">
+
+
+</section>
+
+
+<section layout:fragment="layout_content">
+
+						<div class="row">
+						
+								<div class="col-lg-12">
+									<form  id="kt_form"  th:action="@{/master/apacheuri/edit}" th:object="${apacheUri}" method="post" >
+							
+									<input type="hidden" class="form-control" formControlName="id" name="id" id="id"
+					                           th:field="*{id}">              
+                
+							
+									<!--begin::Portlet-->
+									<div class="kt-portlet kt-portlet--last kt-portlet--head-lg kt-portlet--responsive-mobile" id="kt_page_portlet">
+										<div class="kt-portlet__head kt-portlet__head--lg">
+											<div class="kt-portlet__head-label">
+												<h3 class="kt-portlet__head-title">Edit Apache URI</h3>
+											</div>
+											<div class="kt-portlet__head-toolbar">
+												<a th:href="@{/master/apacheuri/index}" class="btn btn-clean kt-margin-r-10">
+													<i class="la la-arrow-left"></i>
+													<span class="kt-hidden-mobile">Back</span>
+												</a>
+												<div class="btn-group">
+													<button type="submit" class="btn btn-brand">
+														<i class="la la-check"></i>
+														<span class="kt-hidden-mobile">Save</span>
+													</button>
+													
+												</div>
+											</div>
+										</div>
+										<div class="kt-portlet__body">
+												<div class="row">
+													<div class="col-xl-2"></div>
+													<div class="col-xl-8">
+														<div class="kt-section kt-section--first">
+															<div class="kt-section__body">
+																<h3 class="kt-section__title kt-section__title-lg">Apache URI Info:</h3>
+																<div class="form-group row">
+																	<label class="col-3 col-form-label">Name</label>
+																	<div class="col-9">
+																		<input class="form-control" type="text" th:field="*{uriName}">
+																	</div>
+																</div>
+																
+																<div class="form-group row">
+																	<label class="col-3 col-form-label">Server Name</label>
+																	<div class="col-9">
+																		
+																		<select  class="form-control" formControlName="serverId"
+					                                                            name="serverId" id="serverId" th:field="*{serverId}" th:value="${apacheUri.serverId}" >
+					                                                            <option th:each="server : ${serverList}" th:value="${server.id}"
+					                                                                    th:text="${server.nama}"></option>
+					                                                        
+					                                                    </select>
+																	</div>
+																</div>
+																
+																<div class="form-group row">
+																	<label class="col-3 col-form-label">Description</label>
+																	<div class="col-9">
+																		<input class="form-control" type="text" th:field="*{description}" th:value="${apacheUri.description}">
+																	</div>
+																</div>
+																
+															</div>
+														</div>	
+														</div>
+													<div class="col-xl-2"></div>
+												</div>
+										</div>
+									</div>
+
+									<!--end::Portlet-->
+							 		</form>
+							
+								</div>
+							</div>
+
+
+
+
+
+</section>
+
+
+
+
+</html>

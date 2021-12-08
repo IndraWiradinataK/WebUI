@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Container Security Centralized Management</title>
+
+  <!-- Bootstrap core CSS -->
+  <link th:href="@{/assets/loginmf/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+
+  <!-- Custom fonts for this template -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link th:href="@{/assets/loginmf/css/style.css}" rel="stylesheet">
+  <link th:href="@{/assets/css/main.css}" rel="stylesheet">
+
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row" style="display: flex;align-items: center;">
+      <div class="col-8">
+        <img th:src="@{/assets/loginmf/img/login.png}" width="100%" alt="">
+      </div>
+
+      <div class="col-4">
+        <div class="row">
+          <div class="col-4 text-right">
+            <img th:src="@{/assets/loginmf/img/logo-btpn.png}" class="" width="80px" alt="">
+          </div>
+          <div class="col-6 py-2 text-left" style="line-height: 16px;">
+            <span style="font-size: 14px;font-weight: 500;">Security Container</span><br>
+            <span style="font-size: 14px;font-weight: 500;">Centralized Management</span>
+          </div>
+        </div>
+        <div class="p-4 my-2 mr-5" style="box-shadow:0px 3px 8px 0px rgba(0,0,0,0.25);">
+          <!-- <span style="font-weight: 600;font-size: 18px;">Welcome back!</span><br><br> -->
+          <form class="login100-form  validate-form" th:action="@{/login}" method="POST">
+            <div style="padding: 0 25px 0 25px" th:if="${param.error}">
+                        <p style="text-align:center;font-size: 20; color: #FF1C19;">Email or Password invalid</p>
+            </div>
+            <span style="font-weight: 800;font-size: 28px;">Log in to your account</span><br><br>
+            <span style="font-weight: 500;font-size: 18px;">Username</span><br>
+            <!-- <input name="username" type="text" class="input100" style="width: 100%;margin-top: 5px;margin-bottom: 5px;padding: 10px;height: 40px;border: 1px solid #c0c0c0;border-radius: 4px;"> -->
+            <div class="wrap-input100 validate-input" data-validate="Username is required" style="border-radius: 4px;">
+                  <input class="input100" type="text" id="username" name="username"  style="width: 100%;height: 40px;border-radius: 4px;">
+                  <span class="focus-input100-1"></span>
+                  <span class="focus-input100-2"></span>
+            </div>
+            <br>
+            <span style="font-weight: 500;font-size: 18px;">Password</span><br>
+            <div class="wrap-input100 rs1 validate-input" data-validate="Password is required" style="border-radius: 4px;">
+                  <input class="input100" type="password" id="password" name="password" style="width: 100%;height: 40px;border-radius: 4px;">
+                  <span class="focus-input100-1"></span>
+                  <span class="focus-input100-2"></span>
+            </div><br><br>
+            <button class="py-2 mt-4 border-radius-4 bg-hover" style="width: 100%;background-color: #FFB648;color: #fff;border: none;">
+                  Login
+            </button>
+         </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Bootstrap core JavaScript -->
+  <script th:src="@{/assets/loginmf/vendor/jquery/jquery.min.js}"></script>
+  <script th:src="@{/assets/loginmf/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/assets/js/main.js}"></script>
+
+</body>
+
+</html>

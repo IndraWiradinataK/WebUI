@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/base">
+
+
+<th:block layout:fragment="css-extra">
+
+<style>
+
+</style>
+
+</th:block>
+
+
+<th:block layout:fragment="js-extra">
+
+</th:block>
+
+
+<section layout:fragment="layout_title">
+	<div class=" flex-wrap py-3" >
+		<div class="card-title">
+			 <h3 class="card-label">Add Falco Config 
+			<span class="d-block text-muted pt-2 font-size-sm">Add detailed Falco Config</span></h3> 
+		</div>
+	</div>
+
+</section>
+
+
+<section layout:fragment="layout_content">
+		<!-- begin:: Content -->
+					
+		<div class="card-body">
+			<form  id="kt_form"  th:action="@{/configfalcoadd}" th:object="${configFalco}" method="post" >
+					<div class="row">
+						<div class="col-xl-2"></div>
+						<div class="col-xl-8">
+							<div class="kt-section kt-section--first">
+								<div class="kt-section__body">
+									<!-- <h3 class="kt-section__title kt-section__title-lg">User Info:</h3> -->
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Name</label>
+										<div class="col-9">
+											<input class="form-control" type="text" th:field="*{name}">
+										</div>
+									</div>
+									
+									<!-- <div class="form-group row">
+										<label class="col-3 col-form-label">Role Name</label>
+										<div class="col-9">
+											
+											<select  class="form-control" formControlName="roleId"
+													name="roleId" id="roleId" th:field="*{roleId}" >
+													<option th:each="role : ${roleList}" th:value="${role.id}"
+															th:text="${role.role}"></option>
+												
+											</select>
+										</div>
+									</div> -->
+								</div>
+							</div>	
+							</div>
+						<div class="col-xl-2"></div>
+					</div>
+			</form>
+		</div>
+		<div class="flex-wrap py-3" style="border-top: 1px solid #EBEDF3;padding: 2rem 2.25rem;">
+			<div class="card-toolbar" style="text-align: right;">
+				<!--begin::Button-->
+				<a th:href="@{/configfalcoindex}" class="btn btn-light-primary font-weight-bolder mr-2">
+					<span class="svg-icon svg-icon-md">
+						<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+							<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+								<rect x="0" y="0" width="24" height="24" />
+								<circle fill="#000000" cx="9" cy="15" r="6" />
+								<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
+							</g>
+						</svg>
+						<!--end::Svg Icon-->
+					</span>Back</a>
+				<!--end::Button-->
+				<!--begin::Button-->
+				<a href="javascript:;" onclick="document.getElementById('kt_form').submit();" class="btn btn-primary font-weight-bolder mr-2">
+				<span class="svg-icon svg-icon-md">
+					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+						<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+							<rect x="0" y="0" width="24" height="24" />
+							<circle fill="#000000" cx="9" cy="15" r="6" />
+							<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
+						</g>
+					</svg>
+					<!--end::Svg Icon-->
+				</span>Save</a>
+				<!--end::Button-->
+			</div>
+		</div>
+
+
+
+
+</section>
+
+
+
+
+</html>
