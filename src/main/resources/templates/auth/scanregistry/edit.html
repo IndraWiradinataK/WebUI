@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/base">
+
+
+<th:block layout:fragment="css-extra">
+	<!-- <link th:href="@{assets/plugins/custom/password-strength-meter-master/dist/password.min.css}" rel="stylesheet" type="text/css" /> -->
+</th:block>
+
+
+<th:block layout:fragment="js-extra">
+	<!-- <script th:src="@{assets/plugins/custom/password-strength-meter-master/dist/password.min.js}"></script> -->
+
+
+
+	
+	<script>
+
+		jQuery(document).ready(function($) {
+
+
+				// $('#submitaction').prop("disabled", true);
+				
+				// $('#registryPass').password().on('password.score', function (e, score) {
+					
+				// 	console.log("score >> ",score)
+				// 	if (score > 75) {
+				// 	  $('#submitaction').prop("disabled", false);
+				// 	} else {
+				// 	  $('#submitaction').prop("disabled", true);
+				// 	}
+				// });
+
+
+		});
+	</script>
+</th:block>
+
+
+<section layout:fragment="layout_title">
+	<div class=" flex-wrap py-3" >
+		<div class="card-title">
+			 <h3 class="card-label">Edit Registry 
+			<span class="d-block text-muted pt-2 font-size-sm">Edit detailed Registry</span></h3> 
+		</div>
+	</div>
+
+</section>
+
+
+<section layout:fragment="layout_content">
+		<!-- begin:: Content -->
+		<form  id="kt_form"  th:action="@{/scanregistryedit}" th:object="${registry}" method="post" >
+					
+		<div class="card-body">
+					<div class="row">
+						<div class="col-xl-2"></div>
+						<div class="col-xl-8">
+							<div class="kt-section kt-section--first">
+								<div class="kt-section__body">
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Name</label>
+										<div class="col-9">
+											<input class="form-control" type="text" th:field="*{registryName}" th:value="${registry.registryName}" readonly>
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Registry</label>
+										<div class="col-9">
+											<input class="form-control" type="text" th:field="*{registry}"  th:value="${registry.registry}" readonly>
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Registry Type</label>
+										<div class="col-9">
+											<input class="form-control" type="text" th:field="*{registryType}" th:value="${registry.registryType}">
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">User</label>
+										<div class="col-9">
+											<input class="form-control" autocomplete="off" type="text" th:field="*{registryUser}" th:value="${registry.registryUser}">
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Password</label>
+										<div class="col-9">
+											<input class="form-control"  autocomplete="new-password" type="password" th:field="*{registryPass}" th:value="${registry.registryPass}">
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Verify</label>
+										<div class="col-9">
+												<select  class="form-control" formControlName="registryVerify" th:field="*{registryVerify}" th:value="${registry.registryVerify}">
+														<option  value="true" selected="selected"> True </option>
+													
+												</select>
+										</div>
+									</div>
+
+
+
+								</div>
+							</div>	
+							</div>
+						<div class="col-xl-2"></div>
+					</div>
+			
+		</div>
+		<div class="flex-wrap py-3" style="border-top: 1px solid #EBEDF3;padding: 2rem 2.25rem;">
+			<div class="card-toolbar" style="text-align: right;">
+				<!--begin::Button-->
+				<a th:href="@{/scanregistryindex}" class="btn btn-light-primary font-weight-bolder mr-2">
+					<span class="svg-icon svg-icon-md">
+						<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+							<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+								<rect x="0" y="0" width="24" height="24" />
+								<circle fill="#000000" cx="9" cy="15" r="6" />
+								<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
+							</g>
+						</svg>
+						<!--end::Svg Icon-->
+					</span>Back</a>
+				<!--end::Button-->
+				<!--begin::Button-->
+				<button type="submit"  id="submitaction" class="btn btn-primary font-weight-bolder mr-2">
+				<span class="svg-icon svg-icon-md">
+					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+						<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+							<rect x="0" y="0" width="24" height="24" />
+							<circle fill="#000000" cx="9" cy="15" r="6" />
+							<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
+						</g>
+					</svg>
+					<!--end::Svg Icon-->
+				</span>Save</button>
+				<!--end::Button-->
+			</div>
+		</div>
+
+	</form>
+
+
+</section>
+
+
+
+
+</html>

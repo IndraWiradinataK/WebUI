@@ -1,0 +1,22 @@
+{
+    "folders": [
+        {
+            "path": "../../../../../../../../../../../../../../git_local/btpn"
+        },
+        {
+            "path": "../../../../../../../../../../../DJP/djp-master"
+        },
+        {
+            "path": "../../../../../../../../../../../BPKH/SOURCE/FE/siskehat-master-master"
+        },
+        {
+            "path": "../../../../../../../../../../../../../../git_local/porte-frontend-temp"
+        },
+        {
+            "path": "../../../../../../../../../gs-authenticating-ldap-main"
+        }
+    ],
+    "settings": {
+        "java.configuration.updateBuildConfiguration": "interactive"
+    }
+}
