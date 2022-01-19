@@ -1,7 +1,6 @@
 package co.id.btpn.web.monitoring.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,10 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import co.id.btpn.web.monitoring.model.policy.anchore.Param;
 import co.id.btpn.web.monitoring.service.OpenshiftClientService;
@@ -35,7 +32,6 @@ import co.id.btpn.web.monitoring.util.Util;
  * @author Ferry Fadly
  */
 @Controller
-@SessionAttributes("attributes")
 public class ConfigFalcoController {
 
 
@@ -44,9 +40,6 @@ public class ConfigFalcoController {
 
     @Value("${falco.config.namespace}")
     private String fNameSpace;
-
-    @Value("${kubernetes.namespace}")
-    private String kNameSpace;
 
 	@Autowired
 	private UserLogRepository userLogRepository;
@@ -60,7 +53,7 @@ public class ConfigFalcoController {
 	
 
     @GetMapping("configfalcoindex")
-    public String index( Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String index( Model model) {
       
     	// List <ConfigFalco> list= configFalcoService.findAll();
     	// model.addAttribute("list", list);
@@ -86,7 +79,7 @@ public class ConfigFalcoController {
     
     
     @GetMapping("configfalcoedit")
-    public String edit(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String id) {
+    public String edit(Param  paramFalco, Model model , @RequestParam String id) {
     	
     	// configFalco = configFalcoService.findById(id);
     	
@@ -108,7 +101,7 @@ public class ConfigFalcoController {
 
 
     @PostMapping("configfalcoedit")
-    public String editPost(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws InvalidNameException {
+    public String editPost(Param  paramFalco, Model model) throws InvalidNameException {
         
 
        NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace(fNameSpace);
@@ -141,9 +134,5 @@ public class ConfigFalcoController {
     }
     
         
-    @ModelAttribute("attributes")
-    public Map<?,?> attributes() {
-        return new HashMap<String,String>();
-    }
 
 }

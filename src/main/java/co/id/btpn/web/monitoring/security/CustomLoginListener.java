@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class CustomLoginListener implements AuthenticationSuccessHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomLoginListener.class);
-    private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
   
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

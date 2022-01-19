@@ -11,18 +11,20 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 /**
  *
  * @author Ferry Fadly
  */
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -52,7 +54,7 @@ public class Userapp  {
 	@Column(name="MODIFIED_DATE", nullable = true)
 	private Date modifiedDate;
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@OnDelete(action = OnDeleteAction.CASCADE)
+	@ManyToOne(fetch = FetchType.EAGER)
+	@Cascade({CascadeType.SAVE_UPDATE})
 	private Role roleId;
 }

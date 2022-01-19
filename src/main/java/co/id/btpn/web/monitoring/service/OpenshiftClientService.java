@@ -5,4 +5,5 @@ import io.fabric8.openshift.client.OpenShiftClient;
 public interface OpenshiftClientService {
 	OpenShiftClient getConnection();
 
+	void setConnection(OpenShiftClient openShiftClient);
 }

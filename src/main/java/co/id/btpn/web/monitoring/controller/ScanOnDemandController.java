@@ -19,12 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -35,7 +32,6 @@ import co.id.btpn.web.monitoring.model.image.Image;
 import co.id.btpn.web.monitoring.model.image.ImagePostScan;
 import co.id.btpn.web.monitoring.repository.UserLogRepository;
 import co.id.btpn.web.monitoring.util.Util;
-import net.bytebuddy.asm.Advice.Return;
 
 
 
@@ -44,7 +40,6 @@ import net.bytebuddy.asm.Advice.Return;
  * @author Ferry Fadly
  */
 @Controller
-@SessionAttributes("attributes")
 public class ScanOnDemandController {
 
 
@@ -71,19 +66,28 @@ public class ScanOnDemandController {
 
 
     
-    @GetMapping("scanondemandindex") public String scanOnDemand(Model model, @ModelAttribute("attributes") Map<?,?> attributes) { 
+    @GetMapping("scanondemandindex") public String scanOnDemand(Model model) { 
         
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(anchoreUsername, anchorePassword);
 
-        Map<String, String> bodyParamMap = new HashMap<String, String>();
+        Map<String, String> bodyParamMap = new HashMap<>();
 
-        HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
+        HttpEntity <?> requestEntity = new HttpEntity<>(bodyParamMap,headers);
         
         ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/images", HttpMethod.GET, requestEntity, String.class);
     
-        Image[] imageList = new Gson().fromJson(responseEntity.getBody().toString(), Image[].class);
+        System.out.println("responseBody.toString() > "+anchoreUrl+"/images");
+
+        Object responseBody =responseEntity.getBody();
+        Image[] imageList = null;
+        if(responseBody!=null){
+            System.out.println("responseBody.toString() > "+responseBody.toString());
+            imageList= new Gson().fromJson(responseBody.toString(), Image[].class);
+        }
+
+
 
         model.addAttribute("list", imageList);
 
@@ -94,7 +98,7 @@ public class ScanOnDemandController {
     public  @ResponseBody String updateCustomRule( @RequestBody Map<String, String> allParams ) throws IOException, InvalidNameException  {
 
     	String tag = "";
-
+        System.out.println("test masuk scanondemandadd ");
         if(!util.isUserLoggedIn()){
             return "SESSION_EXPIRED";
         }
@@ -124,13 +128,14 @@ public class ScanOnDemandController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(anchoreUsername, anchorePassword);
 
-        HttpEntity requestEntity = new HttpEntity(post,headers);
+        HttpEntity <?> requestEntity = new HttpEntity<>(post,headers);
 
       
 
-        ResponseEntity<String> responseEntity = null;
+        ResponseEntity<String> responseEntity ;
         
         try {
+         System.out.println("test masuk rest ");
             responseEntity = restTemplate.exchange(anchoreUrl+"/images", HttpMethod.POST, requestEntity, String.class);
         }catch(HttpClientErrorException e) {
             return new ResponseEntity<>(e.getResponseBodyAsString(), HttpStatus.BAD_REQUEST).getBody();
@@ -143,13 +148,5 @@ public class ScanOnDemandController {
     	return new ResponseEntity<>(responseEntity.getBody(), HttpStatus.OK).getBody();
     }
 
-    
-    
-    
-        
-    @ModelAttribute("attributes")
-    public Map<?,?> attributes() {
-        return new HashMap<String,String>();
-    }
 
 }

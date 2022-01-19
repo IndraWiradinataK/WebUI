@@ -10,6 +10,8 @@
 		<meta charset="utf-8" />
 		<title>Container Security Centralized Management</title>
 		<meta name="description" content="Container Security Centralized Management" />
+		<meta th:name="_csrf" th:content="${_csrf.token}"/>
+		<meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
 		<!-- <meta http-equiv="Content-Security-Policy" content="script-src https: 'unsafe-inline' 'unsafe-eval' 'self'; child-src https: 'unsafe-inline' 'unsafe-eval' 'self'; style-src https: 'unsafe-inline' 'unsafe-eval' 'self'; object-src  https: 'unsafe-inline' ;  frame-src https: 'unsafe-inline' 'unsafe-eval' 'self' "> -->
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 		<!--begin::Fonts-->
@@ -475,11 +477,19 @@
 			}
 
 			function handleAjax(url, type, data, success, error) {
+
+				var token = $("meta[name='_csrf']").attr("content"); 
+				var header = $("meta[name='_csrf_header']").attr("content");
 				$.ajax({
 					url: url,
 					type: type || 'POST',
 					data: Object.assign({ token: '' }, data || {}),
 					contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+					headers: {
+						'Accept': '*/*',
+						'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+						'X-CSRF-TOKEN' : token
+					},
 					success: function(res, status, xhr) {
 						if (success) {
 

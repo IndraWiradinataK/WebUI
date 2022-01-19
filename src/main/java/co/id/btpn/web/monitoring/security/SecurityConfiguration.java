@@ -1,13 +1,14 @@
 package co.id.btpn.web.monitoring.security;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+
+import com.google.common.collect.ImmutableList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,18 +39,13 @@ import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import co.id.btpn.web.monitoring.model.Userapp;
 import co.id.btpn.web.monitoring.repository.UserappRepository;
 import co.id.btpn.web.monitoring.service.UserappService;
-import java.util.Collections;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.core.Ordered;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-import com.google.common.collect.ImmutableList;
 
 /**
  *
@@ -77,9 +73,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Value("${spring.ldap.urls}")
     private String ldapUrls;
 
-    @Value("${spring.ldap.base}")
-    private String ldapBase;
-
     @Value("${spring.ldap.username}")
     private String springLdapUsername;
 
@@ -91,36 +84,42 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Value("${ldap.base.dn.search.filter}")
     private String ldapBaseDnSearchFilter;
+
+	@Value("${app.bypass.ldap}")
+    private boolean appBypassLdap;
 	
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		String password = passwordEncoder().encode("password");
-		// //TODO: Delete before deploy to production
 		
-		auth
-            .inMemoryAuthentication()
-                .withUser("admin").password(password).roles("ADMIN");
+		if(appBypassLdap == Boolean.TRUE){
+			LOG.info("Connecting to LDAP server {}", ldapUrls );
+			LOG.info("LDAP search base {} " , ldapBaseDnSearch);
+			
+			auth
+			.inMemoryAuthentication()
+				.withUser("admin").password(password).roles("ADMIN");
 
-		auth
-            .inMemoryAuthentication()
-                .withUser("user").password(password).roles("USER");
+			auth
+				.inMemoryAuthentication()
+					.withUser("user").password(password).roles("USER");
+		
 
+		}else if(appBypassLdap == Boolean.FALSE){
+			LOG.info("Connecting to LDAP server {}", ldapUrls );
+			LOG.info("LDAP search base {} " , ldapBaseDnSearch);
 
-		LOG.info("Connecting to LDAP server {}", ldapUrls );
-		LOG.info("LDAP search base {} " , ldapBaseDnSearch);
-
-
-		auth
-		.ldapAuthentication()
-		.userDetailsContextMapper(userDetailsContextMapper())
-		.ldapAuthoritiesPopulator(getCustomLdapAuthoritiesPopulator())
-		.userSearchBase(ldapBaseDnSearch)
-        .userSearchFilter(ldapBaseDnSearchFilter)
-		  .contextSource()
-			.url(ldapUrls)
-			.managerDn(springLdapUsername)
-            .managerPassword(springLdapPassword);
-
+			auth
+			.ldapAuthentication()
+			.userDetailsContextMapper(userDetailsContextMapper())
+			.ldapAuthoritiesPopulator(getCustomLdapAuthoritiesPopulator())
+			.userSearchBase(ldapBaseDnSearch)
+			.userSearchFilter(ldapBaseDnSearchFilter)
+			.contextSource()
+				.url(ldapUrls)
+				.managerDn(springLdapUsername)
+				.managerPassword(springLdapPassword);
+		}
 	
 	}
 
@@ -146,7 +145,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/layout").hasAnyAuthority("ADMIN", "USER")
 				.anyRequest()
 				.authenticated()
-				.and().csrf().disable().formLogin()
+				.and().formLogin()
 				.loginPage("/login").failureUrl("/login?error=true")
 				.successHandler(customLoginListener)
 				.failureHandler(customLoginFailedListener)
@@ -204,7 +203,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 HttpSession session= se.getSession();
                 SecurityContextHolder.clearContext();
-                     session= se.getSession();
                     if(session != null) {
                         session.invalidate();
                         try {
@@ -236,8 +234,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				}catch(Exception ex){
 					LOG.info(">>>>> userThumbnailPhoto NOT FOUND");
 				}
-				
-				
 				
                 return details2;
             }
@@ -278,7 +274,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new CustomLdapAuthoritiesPopulator();
     }
 
-	private class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
+	public class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
  
 		@Override
 		public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {

@@ -17,10 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.client.RestTemplate;
 
 import co.id.btpn.web.monitoring.model.image.Registry;
@@ -37,7 +35,6 @@ import co.id.btpn.web.monitoring.util.Util;
  * @author Ferry Fadly
  */
 @Controller
-@SessionAttributes("attributes")
 public class RegistryController {
 
 
@@ -65,28 +62,32 @@ public class RegistryController {
     
    
     @GetMapping("scanregistryindex") 
-    public String scanRegistry(Model model, @ModelAttribute("attributes") Map<?,?> attributes) { 
+    public String scanRegistry(Model model) { 
          
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(anchoreUsername, anchorePassword);
 
-        Map<String, String> bodyParamMap = new HashMap<String, String>();
+        Map<String, String> bodyParamMap = new HashMap<>();
 
-        HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
+        HttpEntity <?> requestEntity = new HttpEntity<>(bodyParamMap,headers);
         
         ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries", HttpMethod.GET, requestEntity, String.class);
     
-        Registry[] registryList = new Gson().fromJson(responseEntity.getBody().toString(), Registry[].class);
+        Object responseBody =responseEntity.getBody();
+        Registry[] imageList = null;
+        if(responseBody!=null){
+            imageList= new Gson().fromJson(responseBody.toString(), Registry[].class);
+        }
 
-        model.addAttribute("list", registryList);
+        model.addAttribute("list", imageList);
         
         return "auth/scanregistry/index"; 
     }
 
 
     @GetMapping("scanregistryadd")
-    public String add(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String add(Registry registry, Model model) {
         
     	
     	return "auth/scanregistry/add";
@@ -94,7 +95,7 @@ public class RegistryController {
 
 
     @PostMapping("scanregistryadd")
-    public String addPost(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws InvalidNameException {
+    public String addPost(Registry registry, Model model) throws InvalidNameException {
         
     	
         HttpHeaders headers = new HttpHeaders();
@@ -106,8 +107,8 @@ public class RegistryController {
         Gson gson = new Gson();
         String json = gson.toJson(registry);
 
-        HttpEntity requestEntity = new HttpEntity(json,headers);
-        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries", HttpMethod.POST, requestEntity, String.class);
+        HttpEntity <?> requestEntity = new HttpEntity<>(json,headers);
+        restTemplate.exchange(anchoreUrl+"/registries", HttpMethod.POST, requestEntity, String.class);
               
 
 
@@ -124,31 +125,31 @@ public class RegistryController {
 
 
     @GetMapping("scanregistryedit")
-    public String edit(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes, @RequestParam String rname) {
+    public String edit(Registry registry, Model model, @RequestParam String rname) {
         
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(anchoreUsername, anchorePassword);
 
-        Map<String, String> bodyParamMap = new HashMap<String, String>();
+        Map<String, String> bodyParamMap = new HashMap<>();
 
-        HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
+        HttpEntity <?> requestEntity = new HttpEntity<>(bodyParamMap,headers);
         
         ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries/"+rname, HttpMethod.GET, requestEntity, String.class);
 
-        Registry[] imageList = new Gson().fromJson(responseEntity.getBody().toString(), Registry[].class);
+        Object responseBody =responseEntity.getBody();
+        Registry[] imageList ;
+        if(responseBody!=null){
+            imageList= new Gson().fromJson(responseBody.toString(), Registry[].class);
+            model.addAttribute("registry", imageList[0]); 
+        }
 
-        model.addAttribute("registry", imageList[0]); 
-
-
-      
-    	
     	return "auth/scanregistry/edit";
     }
 
     @PostMapping("scanregistryedit")
-    public String addEditPost(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws InvalidNameException {
+    public String addEditPost(Registry registry, Model model) throws InvalidNameException {
         
     	
         HttpHeaders headers = new HttpHeaders();
@@ -160,8 +161,8 @@ public class RegistryController {
         Gson gson = new Gson();
         String json = gson.toJson(registry);
 
-        HttpEntity requestEntity = new HttpEntity(json,headers);
-        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries/"+registry.getRegistry(), HttpMethod.PUT, requestEntity, String.class);
+        HttpEntity <?> requestEntity = new HttpEntity<>(json,headers);
+        restTemplate.exchange(anchoreUrl+"/registries/"+registry.getRegistry(), HttpMethod.PUT, requestEntity, String.class);
            
         UserLog userLog = new UserLog();
         userLog.setActivity("Edit Registry = \""+ registry.getRegistryName() +"\"  ");
@@ -176,7 +177,7 @@ public class RegistryController {
 
 
     @GetMapping("scanregistrydelete")
-    public String delete(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String rname) throws InvalidNameException {
+    public String delete(Registry registry, Model model , @RequestParam String rname) throws InvalidNameException {
           	
 
         HttpHeaders headers = new HttpHeaders();
@@ -184,14 +185,13 @@ public class RegistryController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(anchoreUsername, anchorePassword);
 
-        registry = new Registry();
         registry.setRegistry(rname);
 
         Gson gson = new Gson();
         String json = gson.toJson(registry);
 
-        HttpEntity requestEntity = new HttpEntity(json,headers);
-        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries/"+registry.getRegistry(), HttpMethod.DELETE, requestEntity, String.class);
+        HttpEntity <?> requestEntity = new HttpEntity<>(json,headers);
+        restTemplate.exchange(anchoreUrl+"/registries/"+registry.getRegistry(), HttpMethod.DELETE, requestEntity, String.class);
               
         UserLog userLog = new UserLog();
         userLog.setActivity("Delete Registry = \""+ registry.getRegistryName() +"\"  ");
@@ -205,13 +205,5 @@ public class RegistryController {
     	return "redirect:scanregistryindex";
     }
     
-    
-    
-    
-        
-    @ModelAttribute("attributes")
-    public Map<?,?> attributes() {
-        return new HashMap<String,String>();
-    }
 
 }

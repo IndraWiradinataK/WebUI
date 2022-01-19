@@ -14,8 +14,6 @@ public interface UserappService {
 	
 	void update(Userapp userapp);
 	
-	void deactive(Userapp userapp);
-
 	void deactiveById(long id);
 
 	List<Userapp> findByName(String name);

@@ -2,9 +2,7 @@ package co.id.btpn.web.monitoring.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,8 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import co.id.btpn.web.monitoring.model.PodExt;
 import co.id.btpn.web.monitoring.service.OpenshiftClientService;
@@ -28,7 +24,6 @@ import io.fabric8.kubernetes.api.model.Pod;
  * @author Ferry Fadly
  */
 @Controller
-@SessionAttributes("attributes")
 public class RootController {
 
     @Value("${kibana.dashboard.url}")
@@ -56,7 +51,7 @@ public class RootController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @GetMapping("/dashboard")
-    public String dashboard(HttpServletRequest request, Model model, @ModelAttribute("attributes") Map<?, ?> attributes) {
+    public String dashboard(HttpServletRequest request, Model model) {
 
         
         model.addAttribute("kibanaUrl", kibanaUrl);
@@ -64,7 +59,7 @@ public class RootController {
     }
 
     @GetMapping("servicestatusindex")
-    public String serviceStatus(Model model, @ModelAttribute("attributes") Map<?, ?> attributes)
+    public String serviceStatus(Model model)
             throws JsonIOException, IOException {
 
         List<PodExt> pods = new ArrayList<>();
@@ -76,11 +71,6 @@ public class RootController {
 
         model.addAttribute("list", pods);
         return "auth/servicestatus/index";
-    }
-
-    @ModelAttribute("attributes")
-    public Map<String, String> attributes() {
-        return new HashMap<String, String>();
     }
 
 }

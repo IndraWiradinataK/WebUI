@@ -17,7 +17,7 @@ import java.util.List;
 @Repository("userappRepository")
 public interface UserappRepository extends JpaRepository<Userapp, Long> {
 
-    @Query("SELECT r FROM Userapp r where r.name  = :name ") 
+    @Query("SELECT r FROM Userapp r where r.name = :name ") 
     List<Userapp> findByName(@Param("name") String name);
 	 
 }

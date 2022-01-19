@@ -1,7 +1,5 @@
 package co.id.btpn.web.monitoring.util;
 
-import javax.servlet.http.HttpSession;
-
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +21,12 @@ public class Util {
         }else if (principal instanceof UserDetails) {
             return  ((UserDetails)principal).getUsername();
         }else {
-            return principal.toString();
+            if (principal!=null) {
+                return principal.toString();
+            }else{
+                return null;
+            }
+          
         }
     } 
 
@@ -48,8 +51,7 @@ public class Util {
     public boolean isUserLoggedIn() {
         if (getLoggedUserName().equalsIgnoreCase("anonymousUser")) {
             return false;
-        }else{
-            return true;
         }
+        return true;
     }
 }

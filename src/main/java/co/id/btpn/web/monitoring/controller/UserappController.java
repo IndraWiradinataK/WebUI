@@ -2,7 +2,6 @@ package co.id.btpn.web.monitoring.controller;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import co.id.btpn.web.monitoring.model.Role;
 import co.id.btpn.web.monitoring.model.Userapp;
@@ -29,7 +26,6 @@ import co.id.btpn.web.monitoring.service.LdapSearchService;
  * @author Ferry Fadly
  */
 @Controller
-@SessionAttributes("attributes")
 public class UserappController {
 
 	@Autowired
@@ -45,9 +41,8 @@ public class UserappController {
     @Autowired
 	private Util util;
 	
-
     @GetMapping("userappindex")
-    public String index(Userapp  userapp, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String index(co.id.btpn.web.monitoring.dto.Userapp  userapp, Model model) {
       
     	List <Userapp> list= userappService.findAll();
         
@@ -57,10 +52,9 @@ public class UserappController {
     }
     
     @GetMapping("userappadd")
-    public String add(Userapp  userapp, Model model, @ModelAttribute("attributes") Map<?,?>  attributes) {
+    public String add(co.id.btpn.web.monitoring.dto.Userapp  userapp, Model model) {
         
     	List <Role> list= roleService.findAll();
-        System.out.println("Role Count >>>> "+list.size());
 
     	model.addAttribute("roleList", list);
         
@@ -70,27 +64,25 @@ public class UserappController {
 
 
     @PostMapping("userappadd")
-    public String addPost(Userapp  userapp, Model model, @ModelAttribute("attributes") Map<?,?>  attributes) {
+    public String addPost(Userapp  userapp, Model model) { //NOSONAR
         
-    	userappService.save(userapp);;
+    	userappService.save( userapp);
     	
     	return "redirect:userappindex";
     }
     
     
     @GetMapping("userappedit")
-    public String edit(Userapp  userapp, Model model, @ModelAttribute("attributes") Map<?,?>  attributes , @RequestParam Long id) {
+    public String edit(co.id.btpn.web.monitoring.dto.Userapp  userapp, Model model, @RequestParam Long id) {
         
 
     	List <Role> list= roleService.findAll();
 
-        System.out.println("Role Count >>>> "+list.size());
 
     	model.addAttribute("roleList", list);
     	
-    	userapp = userappService.findById(id);
-    	
-    	model.addAttribute("userapp", userapp);
+    	Userapp userappDB = userappService.findById(id);
+    	model.addAttribute("userapp", userappDB);
         
     	
     	return "auth/userapp/edit";
@@ -98,16 +90,17 @@ public class UserappController {
 
 
     @PostMapping("userappedit")
-    public String editPost(Userapp  userapp, Model model, @ModelAttribute("attributes") Map<?,?>  attributes) {
+    public String editPost(Userapp  userapp, Model model) {//NOSONAR
         
-    	userappService.update(userapp);;
+    
+    	userappService.update(userapp);
     	
     	return "redirect:userappindex";
     }
     
     
     @GetMapping("userappdelete")
-    public String delete(Userapp  userapp, Model model, @ModelAttribute("attributes") Map<?,?>  attributes , @RequestParam Long id) {
+    public String delete(co.id.btpn.web.monitoring.dto.Userapp  userapp, Model model, @RequestParam Long id) {
           	
     	userappService.deactiveById(id);
     	
@@ -131,10 +124,5 @@ public class UserappController {
 
     	return lp;
     }
-        
-    @ModelAttribute("attributes")
-    public Map<?,?>  attributes() {
-        return new HashMap<String,String>();
-    }
-
+    
 }

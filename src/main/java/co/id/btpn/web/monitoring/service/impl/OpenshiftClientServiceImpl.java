@@ -17,9 +17,6 @@ import io.fabric8.openshift.client.OpenShiftClient;
 public class OpenshiftClientServiceImpl implements OpenshiftClientService{
 
 	    private static final Logger logger = LoggerFactory.getLogger(OpenshiftClientServiceImpl.class);
-
-        private KubernetesClient client =null;
-
         
         @Value("${kubernetes.keystore.file}")
         private String kubernetesKeystoreFile;
@@ -46,17 +43,15 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
         @Value("${kubernetes.auth.basic.password}")
         private String kubernetesAuthBasicPassword;
 
-        @Value("${kubernetes.auth.tryServiceAccount}")
-        private String kubernetesAuthTryServiceAccount;
-
-        // @Value("${kubernetes.certs.client.file}")
-        // private String kubernetesCertsClientFile;
-
-        // @Value("${kubernetes.auth.token}")
-        // private String kubernetesAuthToken;
-
         @Value("${kubernetes.namespace}")
         private String kubernetesNamespace;
+
+        OpenShiftClient oClient ;
+
+        @Override
+        public void setConnection(OpenShiftClient client) {
+            oClient = client;
+        }
 
         @Override
         public OpenShiftClient getConnection() {
@@ -66,6 +61,10 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
         String trustStore = basedir + kubernetesTruststoreFile;
 		
         System.setProperty("kubernetes.trust.certificates", "true");
+
+        if(oClient !=null ){
+            return oClient;
+        }else{
             if(!kubernetesForceBasicAuth){
                 System.setProperty("kubernetes.auth.tryServiceAccount", "true");
                 try (KubernetesClient client =  new DefaultKubernetesClient(new ConfigBuilder()
@@ -80,7 +79,7 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
                         logger.warn("Target cluster is not OpenShift compatible");
                         return null;
                     }else{
-                        OpenShiftClient oClient = client.adapt(OpenShiftClient.class);
+                        oClient = client.adapt(OpenShiftClient.class);
                         logger.info("Login Successful to : {} ",oClient.getMasterUrl());
                         return oClient;
                     } 
@@ -101,12 +100,14 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
                         logger.warn("Target cluster is not OpenShift compatible");
                         return null;
                     }else{
-                        OpenShiftClient oClient = client.adapt(OpenShiftClient.class);
+                        oClient = client.adapt(OpenShiftClient.class);
                         logger.info("Login Successful to : {} ",oClient.getMasterUrl());
                         return oClient;
                     } 
                 }
             }
+        }
+
         }
     
 }

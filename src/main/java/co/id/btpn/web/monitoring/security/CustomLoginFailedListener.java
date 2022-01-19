@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CustomLoginFailedListener implements AuthenticationFailureHandler {
-  private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+  private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
   
     private static final Logger LOG = LoggerFactory.getLogger(CustomLoginFailedListener.class);
 

@@ -10,11 +10,14 @@
 	</parent>
 	<groupId>co.id.btpn.web</groupId>
 	<artifactId>container-monitoring</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<name>container-monitoring</name>
 	<description>Container SEC Monitoring using Spring Boot</description>
 	<properties>
 		<java.version>1.8</java.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+ 		<maven.compiler.target>1.8</maven.compiler.target>
+		<sonar.qualitygate.wait>true</sonar.qualitygate.wait>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -72,12 +75,6 @@
 			<version>2.8.5</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<version>1.9.3</version>
-		</dependency> -->
-
 		<!-- database -->
 		<dependency>
 		    <groupId>org.hibernate</groupId>
@@ -95,12 +92,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-
-		<!-- <dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
-		</dependency> -->
 
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -141,6 +132,18 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- <dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>2.23.0</version>
+			<scope>test</scope>
+		</dependency> -->
 		
 		<!-- openshift api -->
 		<dependency>
@@ -148,6 +151,30 @@
 			<artifactId>openshift-client</artifactId>
 			<version>5.4.1</version>
 		</dependency> 
+
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>openshift-server-mock</artifactId>
+			<version>5.4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.evosuite</groupId>
+			<artifactId>evosuite-standalone-runtime</artifactId>
+			<version>1.0.6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.florianlopes</groupId>
+			<artifactId>spring-mvc-test-utils</artifactId>
+			<version>2.2.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -156,6 +183,10 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<jvmArguments>
+						-agentpath:/Applications/YourKit-Java-Profiler-2021.11.app/Contents/Resources/bin/mac/libyjpagent.dylib=exceptions=disable,delay=10000,disablestacktelemetry
+						<!-- -agentpath:/Users/ferry/Documents/work/AplicationServer/stackify/stackify-java-apm.jar -->
+					</jvmArguments>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
@@ -164,6 +195,39 @@
 					</excludes>
 				</configuration>
 			</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>3.0.0-M4</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.8.5</version>
+					<executions>
+						<execution>
+							<id>default-prepare-agent</id>
+							<goals>
+								<goal>prepare-agent</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>default-report</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 		</plugins>
 	</build>
 

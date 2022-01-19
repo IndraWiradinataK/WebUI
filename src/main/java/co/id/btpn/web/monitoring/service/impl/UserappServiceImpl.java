@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.naming.InvalidNameException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,9 @@ public class UserappServiceImpl implements UserappService{
 
 	@Autowired
 	private Util util;
+
+	private static final Logger LOG = LoggerFactory.getLogger(UserappServiceImpl.class);
+
 	
 	@Override
 	public void save(Userapp user)  {
@@ -50,8 +55,7 @@ public class UserappServiceImpl implements UserappService{
 		try {
 			userLog.setCn(util.getLoggedCN());
 		} catch (InvalidNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(">>>>>save InvalidNameException ",e);
 		}
 		userLogRepository.save(userLog);
 		
@@ -65,7 +69,6 @@ public class UserappServiceImpl implements UserappService{
 
 	@Override
 	public Userapp findById(long pId) {
-		// TODO Auto-generated method stub
 		return userappRepository.findById(pId).orElse(null);
 	}
 	
@@ -91,55 +94,35 @@ public class UserappServiceImpl implements UserappService{
 		try {
 			userLog.setCn(util.getLoggedCN());
 		} catch (InvalidNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(">>>>>update InvalidNameException ",e);
 		}
 		userLogRepository.save(userLog);
 
 		userappRepository.save(userapp);
 	}
-	
-	@Override
-	public void deactive(Userapp userapp) {
-		userapp.setActive(0);
-		userapp.setModifiedBy(util.getLoggedUserName());
-		userapp.setModifiedDate(new Date());
 
-		UserLog userLog = new UserLog();
-		userLog.setActivity("Deactivated User \""+userapp.getName() +"\" ");
-		userLog.setLogDate(new Date());
-		userLog.setName(util.getLoggedUserName());
-		try {
-			userLog.setCn(util.getLoggedCN());
-		} catch (InvalidNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		userLogRepository.save(userLog);
-
-		userappRepository.save(userapp);
-	}
 
 	@Override
 	public void deactiveById(long pId) {
 		Userapp userapp = userappRepository.findById(pId).orElse(null);
-		userapp.setActive(0);
-		userapp.setModifiedBy(util.getLoggedUserName());
-		userapp.setModifiedDate(new Date());
+		if(userapp != null){
+			userapp.setActive(0);
+			userapp.setModifiedBy(util.getLoggedUserName());
+			userapp.setModifiedDate(new Date());
 
-		UserLog userLog = new UserLog();
-		userLog.setActivity("Deactivated User \""+userapp.getName() +"\" ");
-		userLog.setLogDate(new Date());
-		userLog.setName(util.getLoggedUserName());
-		try {
-			userLog.setCn(util.getLoggedCN());
-		} catch (InvalidNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			UserLog userLog = new UserLog();
+			userLog.setActivity("Deactivated User \""+userapp.getName() +"\" ");
+			userLog.setLogDate(new Date());
+			userLog.setName(util.getLoggedUserName());
+			try {
+				userLog.setCn(util.getLoggedCN());
+			} catch (InvalidNameException e) {
+				LOG.error(">>>>>deactiveById InvalidNameException ",e);
+			}
+			userLogRepository.save(userLog);
+
+			userappRepository.save(userapp);
 		}
-		userLogRepository.save(userLog);
-
-		userappRepository.save(userapp);
 	}
 
 	@Override

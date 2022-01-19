@@ -15,7 +15,6 @@ import javax.naming.directory.Attributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQuery;
@@ -30,26 +29,6 @@ public class LdapSearchServiceImpl implements LdapSearchService{
 
 	    private static final Logger logger = LoggerFactory.getLogger(LdapSearchServiceImpl.class);
 
-        @Value("${spring.ldap.urls}")
-        private String ldapUrls;
-
-        @Value("${spring.ldap.base}")
-        private String ldapBase;
-
-        @Value("${spring.ldap.username}")
-        private String springLdapUsername;
-
-        @Value("${spring.ldap.password}")
-        private String springLdapPassword;
-
-        @Value("${ldap.base.dn.search}")
-        private String ldapBaseDnSearch;
-
-        @Value("${ldap.base.dn.search.filter}")
-        private String ldapBaseDnSearchFilter;
-
-        @Value("${ldap.base.dn.search.filter2}")
-        private String ldapBaseDnSearchFilter2;
 
 
         private static final Integer THREE_SECONDS = 3000;
@@ -78,21 +57,6 @@ public class LdapSearchServiceImpl implements LdapSearchService{
            
         }
 
-  
-	private class IsFoundMapper implements AttributesMapper<Boolean> {
-
-		@Override
-		public Boolean mapFromAttributes(Attributes attrs) throws NamingException {
-			NamingEnumeration<? extends Attribute> all = attrs.getAll();
-            int count =  0;
-			while (all.hasMore()) {
-				Attribute id = all.next();
-                count++;
-			}
-			
-			return count>0 ? true:false;
-		}
-	}
    
 
 
@@ -101,13 +65,11 @@ public class LdapSearchServiceImpl implements LdapSearchService{
 		@Override
 		public Map<String, Object>  mapFromAttributes(Attributes attrs) throws NamingException {
 			NamingEnumeration<? extends Attribute> all = attrs.getAll();
-			// StringBuffer result = new StringBuffer();
-			// result.append("\n Result { \n");
+			
                         Map<String, Object> result = new HashMap<>();
 			while (all.hasMore()) {
 				Attribute id = all.next();
 				result.put(id.getID(),  id.get() );
-				//logger.info(id.getID() + "\t | " + id.get());
 			}
 			
 			return result;

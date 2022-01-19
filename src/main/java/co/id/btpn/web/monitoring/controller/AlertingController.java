@@ -26,11 +26,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.client.RestTemplate;
 
 import co.id.btpn.web.monitoring.model.CustomRuleFalco;
@@ -51,7 +49,6 @@ import io.fabric8.kubernetes.client.dsl.Resource;
  * @author Ferry Fadly
  */
 @Controller
-@SessionAttributes("attributes")
 public class AlertingController {
 
 
@@ -63,9 +60,6 @@ public class AlertingController {
 
     @Value("${falco.password}")
     private String falcoPassword;
-
-    @Value("${falco.config.namespace}")
-    private String fNameSpace;
 
     @Value("${kubernetes.namespace}")
     private String kNameSpace;
@@ -87,23 +81,25 @@ public class AlertingController {
     String PRETY_PREFIX_ = "<pre class=\"language-yaml\"><code>";
 	
 
-	
-
     @GetMapping("imagealertindex")
-    public String index(CustomRuleFalco customRuleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws IOException {
+    public String index(CustomRuleFalco customRuleFalco, Model model) throws IOException {
       
     
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-       // headers.setBasicAuth(anchoreUsername, anchorePassword);
        headers.setBasicAuth(falcoUsername, falcoPassword);
 
-        Map<String, String> bodyParamMap = new HashMap<String, String>();
+        Map<String, String> bodyParamMap = new HashMap<>();
 
-        HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
+        HttpEntity<?>  requestEntity = new HttpEntity<>(bodyParamMap,headers);
 
-        ResponseEntity  responseEntity =  restTemplate.exchange(falcoUrl+"/rule/action", HttpMethod.GET, requestEntity, String.class);
-        CustomRuleFalco[] customRuleFalcoList = new Gson().fromJson(responseEntity.getBody().toString(), CustomRuleFalco[].class);
+        ResponseEntity<?>  responseEntity =  restTemplate.exchange(falcoUrl+"/rule/action", HttpMethod.GET, requestEntity, String.class);
+
+        Object responseBody =responseEntity.getBody();
+        CustomRuleFalco[] customRuleFalcoList = null;
+        if(responseBody!=null){
+            customRuleFalcoList= new Gson().fromJson(responseBody.toString(), CustomRuleFalco[].class);
+        }
 
         ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).withName("mail-options").get();
         Properties properties = new Properties();
@@ -117,9 +113,12 @@ public class AlertingController {
         imageScanNOTIFY.setRuleName("Image Scan");
         imageScanNOTIFY.setEnabled(Boolean.parseBoolean(properties.getProperty("ImageScanNOTIFY")) ? 1 : 0);
          
-         
-        customRuleFalcoList = addX(customRuleFalcoList.length, customRuleFalcoList , imageScanNOTIFY );
-
+        if(customRuleFalcoList !=null){
+            customRuleFalcoList = addX(customRuleFalcoList.length, customRuleFalcoList , imageScanNOTIFY );
+        }else{
+            customRuleFalcoList = addX(0, customRuleFalcoList , imageScanNOTIFY );
+        }
+        
         model.addAttribute("list", customRuleFalcoList);
 
 
@@ -132,7 +131,7 @@ public class AlertingController {
     	return "auth/alerting/image";
     }
     
-
+    
 
     @PostMapping("imagealertupdate")
     public  @ResponseBody String updateCustomRule( @RequestParam Map<String,String> allParams ) throws IOException, InvalidNameException {
@@ -168,24 +167,33 @@ public class AlertingController {
 
         headers.setBasicAuth(falcoUsername, falcoPassword);
 
-        Map<String, String> bodyParamMap = new HashMap<String, String>();
+        Map<String, String> bodyParamMap = new HashMap<>();
         bodyParamMap.put("action_id", ""+actionId );
         bodyParamMap.put("enabled", enabled);
 
-        HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
+        HttpEntity<?> requestEntity = new HttpEntity<>(bodyParamMap,headers);
 
         //get action list
-        ResponseEntity  responseEntityAction =  restTemplate.exchange(falcoUrl+"/rule/action", HttpMethod.GET, requestEntity, String.class);
-        CustomRuleFalco[] customRuleFalcoList = new Gson().fromJson(responseEntityAction.getBody().toString(), CustomRuleFalco[].class);
+        ResponseEntity <?> responseEntityAction =  restTemplate.exchange(falcoUrl+"/rule/action", HttpMethod.GET, requestEntity, String.class);
+        if (responseEntityAction == null) {
+            return "error";
+        } 
 
+        Object responseBody =responseEntityAction.getBody();
+        CustomRuleFalco[] customRuleFalcoList;
+        if(responseBody!=null){
+            customRuleFalcoList=  new Gson().fromJson(responseBody.toString(), CustomRuleFalco[].class);
+            for(CustomRuleFalco customRuleFalco:customRuleFalcoList){
+                if( customRuleFalco.getId() == actionId ){
+                 actionName = customRuleFalco.getActionName();
+                }
+             }
+        }
+       
         //post save
         ResponseEntity<String> responseEntity =  restTemplate.exchange(falcoUrl+"/rule/action/"+id, HttpMethod.PUT, requestEntity, String.class);
        
-        for(CustomRuleFalco customRuleFalco:customRuleFalcoList){
-           if( customRuleFalco.getId() == actionId ){
-            actionName = customRuleFalco.getActionName();
-           }
-        }
+       
 
 
 		UserLog userLog = new UserLog();
@@ -197,44 +205,7 @@ public class AlertingController {
 
     	return responseEntity.getBody();
     }
-
     
-    @GetMapping("runtimealertindex")
-    public String runtimeIndex(CustomRuleFalco customRuleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws IOException {
-      
-       ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).withName("mail-options").get();
-       Properties properties = new Properties();
-       InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
-       properties.load(stream);
-
-       List <Param> listObj =  new ArrayList <>();
-
-        Param falcoNOTIFY = new Param();
-        Param falcoACTION = new Param();
-        Param imageScanNOTIFY = new Param();
-       
-        falcoNOTIFY.setDesc("Falco Notify Alert");
-        falcoNOTIFY.setName("FalcoNOTIFY");
-        falcoNOTIFY.setValue(properties.getProperty("FalcoNOTIFY"));
-        falcoACTION.setDesc("Falco Action Alert");
-        falcoACTION.setName("FalcoACTION");
-        falcoACTION.setValue(properties.getProperty("FalcoACTION"));
-        imageScanNOTIFY.setDesc("Image Scan Notify Alert");
-        imageScanNOTIFY.setName("ImageScanNOTIFY");
-        imageScanNOTIFY.setValue(properties.getProperty("ImageScanNOTIFY"));
-
-        listObj.add(falcoNOTIFY);
-        listObj.add(falcoACTION);
-        listObj.add(imageScanNOTIFY);
-
-        model.addAttribute("list", listObj);
-
-        
-    	return "auth/alerting/runtime";
-    }
-
-
-
 
     @PostMapping("runtimealertupdate")
     public  @ResponseBody String updateCustomRule2( @RequestParam Map<String,String> allParams ) throws IOException, InvalidNameException {
@@ -269,7 +240,7 @@ public class AlertingController {
         String out = new String(byteArrayOutputStream.toByteArray(), StandardCharsets.UTF_8);
 
 
-        Map <String,String> configMapData = new HashMap<String,String>();
+        Map <String,String> configMapData = new HashMap<>();
         configMapData.put("mail-options.incl", out);
 
         ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
@@ -281,12 +252,6 @@ public class AlertingController {
             .build();
     
         openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).createOrReplace(newConfigMap);
-
-        // UserLog userLog = new UserLog();
-		// userLog.setActivity("Update Runtime Alert = "+ enabled);
-		// userLog.setLogDate(new Date());
-		// userLog.setName(util.getLoggedUserName());
-		// userLogRepository.save(userLog);
 
         UserLog userLog = new UserLog();
 		userLog.setActivity("Update Alert Name = Image Scan , enabled = \""+ (enabled.equals("1")  ? "Enable" : "Disabled") +"\" ");
@@ -318,7 +283,7 @@ public class AlertingController {
 
 
     @GetMapping("emailconfig")
-    public String edit(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String id) {
+    public String edit(Param  paramFalco, Model model, @RequestParam String id) {
     	
 
        ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).withName("mail-recipient-list").get();
@@ -336,7 +301,7 @@ public class AlertingController {
 
 
     @PostMapping("emailconfig")
-    public String editPost(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws InvalidNameException {
+    public String editPost(Param  paramFalco, Model model) throws InvalidNameException {
         
        
         NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace);
@@ -364,13 +329,6 @@ public class AlertingController {
 		userLogRepository.save(userLog);
 
     	return "redirect:imagealertindex";
-    }
-    
-    
-        
-    @ModelAttribute("attributes")
-    public Map<?,?> attributes() {
-        return new HashMap<String,String>();
     }
 
 }

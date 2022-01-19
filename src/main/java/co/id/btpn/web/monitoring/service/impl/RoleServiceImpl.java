@@ -30,7 +30,6 @@ public class RoleServiceImpl implements RoleService{
 
 	@Override
 	public Role findById(long pId) {
-		// TODO Auto-generated method stub
 		return roleRepository.findById(pId).orElse(null);
 	}
 	

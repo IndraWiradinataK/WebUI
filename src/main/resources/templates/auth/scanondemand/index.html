@@ -199,6 +199,9 @@ function deleteRow(aId){
 
 
 function addDialogScan(){
+	var token = $("meta[name='_csrf']").attr("content"); 
+
+
 	Swal.fire({
 		title: 'Submit image full tag to scan',
 		input: 'text',
@@ -213,7 +216,8 @@ function addDialogScan(){
 					method: 'post',
 					headers: {
 						'Accept': '*/*',
-						'Content-Type': 'application/json'
+						'Content-Type': 'application/json',
+						'X-CSRF-TOKEN' : token
 					},
 					body: JSON.stringify({ tag: tagV})
 					})

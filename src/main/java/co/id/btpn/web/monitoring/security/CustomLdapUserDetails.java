@@ -38,42 +38,48 @@ public class CustomLdapUserDetails implements LdapUserDetails {
         this.thumbnailPhoto = thumbnailPhoto;
     }
 
-    
+    @Override
     public boolean isEnabled() {
         return details.isEnabled() && getUsername().equals(env.getRequiredProperty("ldap.username"));
     }
-    
+
+    @Override
     public String getDn() {
         return details.getDn();
     }
-    
+
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return details.getAuthorities();
     }
-    
+
+    @Override
     public String getPassword() {
         return details.getPassword();
     }
     
+    @Override
     public String getUsername() {
         return details.getUsername();
     }
     
+    @Override
     public boolean isAccountNonExpired() {
         return details.isAccountNonExpired();
     }
     
+    @Override
     public boolean isAccountNonLocked() {
         return details.isAccountNonLocked();
     }
     
+    @Override
     public boolean isCredentialsNonExpired() {
         return details.isCredentialsNonExpired();
     }
 
     @Override
     public void eraseCredentials() {
-        // TODO Auto-generated method stub
         details.eraseCredentials();
         
     }
@@ -84,5 +90,21 @@ public class CustomLdapUserDetails implements LdapUserDetails {
 
     public void setCn(String cn) {
         this.cn = cn;
+    }
+
+    public LdapUserDetails getDetails() {
+        return details;
+    }
+
+    public void setDetails(LdapUserDetails details) {
+        this.details = details;
+    }
+
+    public Environment getEnv() {
+        return env;
+    }
+
+    public void setEnv(Environment env) {
+        this.env = env;
     }
 }
